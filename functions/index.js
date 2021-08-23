@@ -1,12 +1,5 @@
 const functions = require('firebase-functions')
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
 const admin = require('firebase-admin')
 admin.initializeApp()
 
@@ -33,5 +26,29 @@ exports.deleteLike = functions
             .doc(context.params.postId)
             .update({
                 numLikes: admin.firestore.FieldValue.increment(-1),
+            })
+    })
+
+exports.addRetweet = functions
+    .region('us-east4')
+    .firestore.document('/posts/{postId}/retweets/{userId}')
+    .onCreate((snap, context) => {
+        return db
+            .collection('posts')
+            .doc(context.params.postId)
+            .update({
+                numRetweets: admin.firestore.FieldValue.increment(1),
+            })
+    })
+
+exports.deleteRetweet = functions
+    .region('us-east4')
+    .firestore.document('/posts/{postId}/retweets/{userId}')
+    .onDelete((snap, context) => {
+        return db
+            .collection('posts')
+            .doc(context.params.postId)
+            .update({
+                numRetweets: admin.firestore.FieldValue.increment(-1),
             })
     })
